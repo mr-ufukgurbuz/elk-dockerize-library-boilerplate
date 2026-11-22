@@ -2,7 +2,8 @@ name: Offline Bundle
 
 # Offline kurulum paketini uretir ve GitHub Release'e yukler.
 # Tetikleme:
-#   1) offline-bundle/RELEASE dosyasi degisip push'laninca (surumler o dosyadan okunur)
+#   1) offline-bundle/RELEASE, build-bundle.sh veya bu workflow degisip push'laninca
+#      (surumler RELEASE dosyasindan okunur; ayni etiketteki dosyalar guncellenir)
 #   2) Elle: Actions -> Offline Bundle -> Run workflow (girdiler RELEASE dosyasini ezer)
 # Cikti: Releases sayfasinda elk-offline-bundle-<surum>-<arch>.tar.gz (+ .sha256)
 #        (GitHub release asset siniri 2 GB; paket ~1.6 GB)
@@ -10,6 +11,8 @@ on:
   push:
     paths:
       - offline-bundle/RELEASE
+      - offline-bundle/build-bundle.sh
+      - .github/workflows/offline-bundle.yml
   workflow_dispatch:
     inputs:
       bundle_tag:
@@ -108,6 +111,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.prepare.outputs.tag }}
+          overwrite_files: true
           files: |
             dist/elk-offline-bundle-*.tar.gz
             dist/elk-offline-bundle-*.tar.gz.sha256

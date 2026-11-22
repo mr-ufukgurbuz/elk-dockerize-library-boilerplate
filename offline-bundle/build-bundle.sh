@@ -90,7 +90,12 @@ if [ "$SKIP_IMAGES" = 0 ]; then
   if [ "$CT" = podman ]; then
     podman save --format docker-archive -m -o "$WORK/images/elk-images-${ELK_VERSION}.tar" "${IMAGES[@]}"
   else
-    docker save -o "$WORK/images/elk-images-${ELK_VERSION}.tar" "${IMAGES[@]}"
+    # containerd imaj deposunda (Docker 28+) farkli mimari icin --platform zorunludur
+    if docker save --help 2>/dev/null | grep -q -- '--platform'; then
+      docker save --platform "$PLATFORM" -o "$WORK/images/elk-images-${ELK_VERSION}.tar" "${IMAGES[@]}"
+    else
+      docker save -o "$WORK/images/elk-images-${ELK_VERSION}.tar" "${IMAGES[@]}"
+    fi
   fi
 fi
 
