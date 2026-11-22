@@ -78,7 +78,9 @@ Use `load_env` to get `$ES`, `$KB`, `$AUTH`. Use `die` for errors. Keep it idemp
 ## R10. Release a new library version
 
 1. Bump `<version>` in root `pom.xml` and every module `pom.xml` (parent reference too) and `internal/Version.VERSION`.
-2. Update version strings in: `examples/*/pom.xml` dependency, `examples/run-sample.sh`, `libs/install-to-local-maven-repo.sh` (`V=`), `tests/e2e.sh` jar names, docs (`grep -rn "1\.0\.0"`).
+2. Update version strings in: `examples/*/pom.xml` dependency, `examples/run-sample.sh`, `libs/install-to-local-maven-repo.sh` (`V=`), `tests/e2e.sh` jar names,
+   `examples/gradle-sample/build.gradle` (jar file names), `examples/plain-java-sample/{build.sh,build.bat,.classpath}` (jar name + MANIFEST Class-Path),
+   `.github/workflows/ci.yml` (consumers job), docs (`grep -rn "1\.0\.0" --exclude-dir=target .`).
 3. `mvn -B verify`, copy jars to `dist/` (`cp libs/*/target/elk-logger*.jar dist/` and remove old ones).
 
 ## R11. Publish a new offline bundle release

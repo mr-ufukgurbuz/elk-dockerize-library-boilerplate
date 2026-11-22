@@ -27,18 +27,39 @@ RUN_ID="e2e$(date +%s)"
 export APP_ENV="$RUN_ID"
 (cd examples/order-service-sample && java -cp "target/order-service-sample-1.0.0.jar:target/lib/*" com.example.orders.OrderServiceApp 40 0 >/dev/null)
 (cd examples/payment-service-slf4j-sample && java -cp "target/payment-service-slf4j-sample-1.0.0.jar:target/lib/*" com.example.payments.PaymentServiceApp 20 0 >/dev/null)
+# Proje D: Maven/Gradle olmayan duz Java (javac + java -cp)
+cp libs/elk-logger/target/elk-logger-1.0.0.jar examples/plain-java-sample/lib/
+(cd examples/plain-java-sample && ./build.sh >/dev/null && ./run.sh cp 15 0 >/dev/null && ./run.sh jar 5 0 >/dev/null)
+# Proje C: Gradle (kuruluysa)
+HAS_GRADLE=0
+if command -v gradle >/dev/null 2>&1; then
+  HAS_GRADLE=1
+  (cd examples/gradle-sample && gradle --offline -q run --args="15 0" -PelkLoggerJar="$ROOT/libs/elk-logger/target/elk-logger-1.0.0.jar" >/dev/null)
+fi
 
 ES="http://127.0.0.1:${ES_PORT}"
 count() { curl -s -u "elastic:$ELASTIC_PASSWORD" "$ES/$1/_count" -H 'Content-Type: application/json' \
   -d "{\"query\":{\"term\":{\"environment\":\"$RUN_ID\"}}}" | sed -E 's/.*"count":([0-9]+).*/\1/'; }
 
-for i in $(seq 1 30); do
-  a=$(count 'applogs-order-service-*'); b=$(count 'applogs-payment-service-*')
-  [ "${a:-0}" -gt 0 ] && [ "${b:-0}" -gt 0 ] && break; sleep 2
-done
-echo "order-service dokuman: $a  payment-service dokuman: $b"
+# index'in en az $2 dokumana ulasmasini bekle (refresh_interval 5 sn), sayiyi yaz
+wait_count() {
+  local n=0
+  for _ in $(seq 1 30); do
+    n=$(count "$1"); [ "${n:-0}" -ge "$2" ] && break; sleep 2
+  done
+  echo "${n:-0}"
+}
+a=$(wait_count 'applogs-order-service-*' 40)
+b=$(wait_count 'applogs-payment-service-*' 20)
+c=$(wait_count 'applogs-billing-batch-*' 20)
+echo "order-service dokuman: $a  payment-service dokuman: $b  billing-batch (duz Java) dokuman: $c"
 [ "$a" -ge 40 ] || fail "order-service loglari eksik ($a)"
 [ "$b" -ge 20 ] || fail "payment-service loglari eksik ($b)"
+[ "$c" -ge 20 ] || fail "billing-batch (duz Java) loglari eksik ($c)"
+if [ "$HAS_GRADLE" = 1 ]; then
+  g=$(wait_count 'applogs-inventory-service-*' 15); echo "inventory-service (Gradle) dokuman: $g"
+  [ "$g" -ge 15 ] || fail "inventory-service (Gradle) loglari eksik ($g)"
+fi
 cross=$(curl -s -u "elastic:$ELASTIC_PASSWORD" "$ES/applogs-order-service-*/_count?q=project:payment-service" | sed -E 's/.*"count":([0-9]+).*/\1/')
 [ "$cross" = 0 ] || fail "proje izolasyonu bozuk: order index'inde payment logu var"
 errs=$(curl -s -u "elastic:$ELASTIC_PASSWORD" "$ES/applogs-*/_count" -H 'Content-Type: application/json' \

@@ -64,6 +64,48 @@ class ConfigLoaderTest {
     }
 
     @Test
+    void workingDirectoryConfigIsFoundForPlainJavaProjects() throws Exception {
+        Files.createDirectories(tmp.resolve("config"));
+        Files.write(tmp.resolve("config/elk-logger.properties"),
+                "elk.project.name=billing-batch\nelk.logstash.host=wd-host\n".getBytes("UTF-8"));
+        Properties sys = new Properties();
+        sys.setProperty("user.dir", tmp.toString());
+        ElkConfig c = ElkConfig.fromProperties(ConfigLoader.loadProperties(sys, new HashMap<>(), null));
+        assertEquals("billing-batch", c.getProjectName());
+        assertEquals("wd-host", c.getHost());
+    }
+
+    @Test
+    void firstWorkingDirectoryCandidateWinsAndExplicitFileOverrides() throws Exception {
+        Files.createDirectories(tmp.resolve("config"));
+        Files.write(tmp.resolve("elk-logger.properties"), "elk.project.name=root-file\nelk.level=WARN\n".getBytes("UTF-8"));
+        Files.write(tmp.resolve("config/elk-logger.properties"), "elk.project.name=config-dir\n".getBytes("UTF-8"));
+        Path explicit = tmp.resolve("explicit.properties");
+        Files.write(explicit, "elk.project.name=explicit\n".getBytes("UTF-8"));
+
+        Properties sys = new Properties();
+        sys.setProperty("user.dir", tmp.toString());
+        ElkConfig c = ElkConfig.fromProperties(ConfigLoader.loadProperties(sys, new HashMap<>(), null));
+        assertEquals("root-file", c.getProjectName());
+
+        sys.setProperty("elk.config.file", explicit.toString());
+        c = ElkConfig.fromProperties(ConfigLoader.loadProperties(sys, new HashMap<>(), null));
+        assertEquals("explicit", c.getProjectName());
+        assertEquals(Level.WARN, c.getRootLevel()); // calisma dizini dosyasindan gelen deger korunur
+    }
+
+    @Test
+    void classpathPrefixLoadsResource() {
+        Properties sys = new Properties();
+        sys.setProperty("user.dir", tmp.toString());
+        sys.setProperty("elk.config.file", "classpath:custom-elk.properties");
+        ElkConfig c = ElkConfig.fromProperties(ConfigLoader.loadProperties(sys, new HashMap<>(),
+                ConfigLoaderTest.class.getClassLoader()));
+        assertEquals("from-classpath-prefix", c.getProjectName());
+        assertEquals("cp", c.getEnvironment());
+    }
+
+    @Test
     void placeholderDefaultUsedWhenMissing() {
         Properties sys = new Properties();
         sys.setProperty("elk.environment", "${NOPE_NOT_SET:fallback}");

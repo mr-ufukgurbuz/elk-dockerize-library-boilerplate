@@ -5,6 +5,9 @@ SLF4J'ye benzer API ile loglayın; loglar arka planda ELK ortamına gider. **Hi�
 
 ## 1. Ekle
 
+Projeniz Maven, Gradle veya build aracı olmayan düz Java olabilir — tek gereken jar'ın classpath'te olması.
+
+**Maven:**
 ```xml
 <dependency>
   <groupId>io.github.elkboilerplate</groupId>
@@ -12,9 +15,26 @@ SLF4J'ye benzer API ile loglayın; loglar arka planda ELK ortamına gider. **Hi�
   <version>1.0.0</version>
 </dependency>
 ```
-Jar: [`dist/elk-logger-1.0.0.jar`](../../dist) · Offline Maven kurulumu: `libs/install-to-local-maven-repo.sh`
+**Gradle:**
+```groovy
+dependencies { implementation files('libs/elk-logger-1.0.0.jar') }   // Kotlin DSL: implementation(files("libs/elk-logger-1.0.0.jar"))
+```
 
-## 2. Yapılandır — `src/main/resources/elk-logger.properties`
+**Düz Java (Maven/Gradle yok):**
+```bash
+javac -cp "lib/*" -d build/classes $(find src -name '*.java')
+java  -cp "build/classes:lib/*:config" com.acme.Main          # Windows: "build\classes;lib\*;config"
+java  @application.classpath com.acme.Main                    # veya classpath'i dosyadan oku
+java  -jar app.jar                                            # MANIFEST: Class-Path: lib/elk-logger-1.0.0.jar config/
+```
+
+Jar: [`dist/elk-logger-1.0.0.jar`](../../dist) · Offline Maven kurulumu: `libs/install-to-local-maven-repo.sh` ·
+Örnekler: [Gradle](../../examples/gradle-sample), [düz Java](../../examples/plain-java-sample)
+
+## 2. Yapılandır — `elk-logger.properties`
+
+Maven/Gradle: `src/main/resources/`. Düz Java: classpath'e eklenen `config/` dizini, ya da çalışma dizininde
+`elk-logger.properties` / `config/elk-logger.properties` (kütüphane kendisi bulur), ya da `-Delk.config.file=...`.
 
 ```properties
 elk.project.name=order-service     # loglama alanı -> applogs-order-service-*

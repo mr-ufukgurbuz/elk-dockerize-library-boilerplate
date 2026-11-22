@@ -10,11 +10,12 @@ Sonraki katman öncekini ezer:
 | # | Kaynak | Örnek |
 |---|---|---|
 | 1 | Kütüphane varsayılanları | — |
-| 2 | Classpath'teki `elk-logger.properties` | `src/main/resources/elk-logger.properties` |
-| 3 | Harici dosya | `-Delk.config.file=/etc/myapp/elk-logger.properties` veya ortam değişkeni `ELK_CONFIG_FILE` |
-| 4 | Ortam değişkenleri `ELK_*` | `ELK_LOGSTASH_HOST=10.0.0.5` → `elk.logstash.host` (büyük harf, `_` → `.`) |
-| 5 | JVM system property `elk.*` | `-Delk.level=DEBUG` |
-| 6 | Kod | `ElkLoggerFactory.configure(props)` |
+| 2 | Classpath'teki `elk-logger.properties` | Maven/Gradle: `src/main/resources/`; düz Java: classpath'e eklenen dizin (`-cp "...:config"`) |
+| 3 | Çalışma dizini (ilk bulunan) | `./elk-logger.properties`, `./config/elk-logger.properties`, `./conf/elk-logger.properties` — build aracı olmayan projeler için |
+| 4 | Açıkça verilen dosya | `-Delk.config.file=/etc/myapp/elk-logger.properties`, ortam değişkeni `ELK_CONFIG_FILE`, veya `-Delk.config.file=classpath:ozel.properties` |
+| 5 | Ortam değişkenleri `ELK_*` | `ELK_LOGSTASH_HOST=10.0.0.5` → `elk.logstash.host` (büyük harf, `_` → `.`) |
+| 6 | JVM system property `elk.*` | `-Delk.level=DEBUG` |
+| 7 | Kod | `ElkLoggerFactory.configure(props)` |
 
 **Placeholder:** Değerlerde `${AD}` veya `${AD:varsayılan}` kullanılabilir. Önce system property, sonra ortam değişkeni aranır:
 
@@ -25,6 +26,8 @@ elk.logstash.host=${ELK_HOST:localhost}
 
 > Tipik kullanım: jar içinde geliştirme varsayılanları (`localhost`), prod'da
 > `-Delk.config.file=/etc/app/elk-logger.properties` veya sadece `ELK_LOGSTASH_HOST` ortam değişkeni.
+
+Hangi dosyaların okunduğunu görmek için `-Delk.debug=true` (veya `ELK_DEBUG=true`): `[elk-logger] DEBUG konfigürasyon okundu: ...`.
 
 Geçersiz bir değer (ör. port=`abc`) **uygulamayı durdurmaz**; varsayılana döner. `elk.debug=true` ile
 etkin konfigürasyon stderr'e yazdırılabilir. Kodda: `ElkLoggerFactory.getConfig()`.

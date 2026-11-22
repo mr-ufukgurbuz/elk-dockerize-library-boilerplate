@@ -51,7 +51,7 @@ Tek dosyalık kurulum paketi (Docker + ELK imajları + kütüphane + dokümanlar
 | [`offline-bundle/`](offline-bundle) | `build-bundle.sh` (internetli makinede paket üretir), `install.sh` (offline RHEL'e Docker + ELK kurar), `uninstall.sh` |
 | [`libs/elk-logger/`](libs/elk-logger) | **Bağımlılıksız** Java 11 loglama kütüphanesi (tek jar) |
 | [`libs/elk-logger-slf4j/`](libs/elk-logger-slf4j) | Opsiyonel SLF4J 2.x provider: mevcut SLF4J kodunu değiştirmeden ELK'ya loglama |
-| [`examples/`](examples) | Örnek Proje A (native API, TCP) ve Örnek Proje B (SLF4J, HTTP) |
+| [`examples/`](examples) | 4 örnek: A (Maven, native API, TCP), B (Maven, SLF4J, HTTP), C (**Gradle**), D (**build aracı yok**, düz Java + classpath) |
 | [`dist/`](dist) | Hazır derlenmiş jar'lar |
 | [`docs/`](docs) | Türkçe kapsamlı doküman seti |
 | [`docs/ai/`](docs/ai) | Bu projeyi refactor edecek yapay zeka ajanları için rehber (İngilizce) |
@@ -78,17 +78,18 @@ sudo ./install.sh --open-firewall
 
 Kurulum sonunda Kibana adresi ve `elastic` kullanıcısının şifresi (`/opt/elk-stack/.env`) gösterilir.
 
-**3) Java projene ekle ve logla:**
+**3) Java projene ekle ve logla** — Maven, Gradle veya hiçbir build aracı olmayan düz Java; hepsi desteklenir.
+Kütüphane bağımlılıksız **tek jar**dır, classpath'te olması yeterlidir:
 
-```xml
-<dependency>
-  <groupId>io.github.elkboilerplate</groupId>
-  <artifactId>elk-logger</artifactId>
-  <version>1.0.0</version>
-</dependency>
-```
+| Proje tipi | Jar'ı ekleme | `elk-logger.properties` nerede |
+|---|---|---|
+| **Maven** | `<dependency><groupId>io.github.elkboilerplate</groupId><artifactId>elk-logger</artifactId><version>1.0.0</version></dependency>` | `src/main/resources/` |
+| **Gradle** | `implementation files('libs/elk-logger-1.0.0.jar')` | `src/main/resources/` |
+| **Düz Java** | `java -cp "classes:lib/elk-logger-1.0.0.jar:config" com.acme.Main` — ya da `CLASSPATH`, `java @application.classpath`, MANIFEST `Class-Path`, IDE | classpath'teki `config/`, çalışma dizini veya `-Delk.config.file` |
 
-`src/main/resources/elk-logger.properties`:
+Detay: [docs/06 §1](docs/06-JAVA-KUTUPHANE.md#1-projeye-ekleme) · örnekler: [Maven](examples/order-service-sample), [Gradle](examples/gradle-sample), [düz Java](examples/plain-java-sample)
+
+`elk-logger.properties`:
 
 ```properties
 elk.project.name=order-service      # -> index: applogs-order-service-YYYY.MM.dd
@@ -121,9 +122,9 @@ sudo elk project create order-service --user order_viewer
 | 03 | [Elasticsearch](docs/03-ELASTICSEARCH.md) | Index yapısı, mapping, sorgu/filtreleme örnekleri, ILM |
 | 04 | [Logstash](docs/04-LOGSTASH.md) | Pipeline, input'lar, kalıcı kuyruk, DLQ |
 | 05 | [Kibana](docs/05-KIBANA.md) | Discover/KQL filtreleme, dashboard, Space'ler, Stack Monitoring, alarmlar |
-| 06 | [Java Kütüphanesi](docs/06-JAVA-KUTUPHANE.md) | API, MDC, yapısal alanlar, SLF4J köprüsü, projeye ekleme |
+| 06 | [Java Kütüphanesi](docs/06-JAVA-KUTUPHANE.md) | Maven/Gradle/düz Java projeye ekleme, API, MDC, yapısal alanlar, SLF4J köprüsü |
 | 07 | [Konfigürasyon Referansı](docs/07-KONFIGURASYON-REFERANSI.md) | Tüm `elk.*` ayarları |
-| 08 | [Örnek Projeler](docs/08-ORNEK-PROJELER.md) | Proje A / Proje B çalıştırma |
+| 08 | [Örnek Projeler](docs/08-ORNEK-PROJELER.md) | Proje A/B (Maven), C (Gradle), D (düz Java) çalıştırma |
 | 09 | [Operasyon ve Sorun Giderme](docs/09-OPERASYON-VE-SORUN-GIDERME.md) | Yedekleme, güncelleme, disk, kapasite, hata çözümleri |
 | 10 | [Güvenlik](docs/10-GUVENLIK.md) | Kullanıcılar, roller, TLS, ağ |
 | 11 | [Docker](docs/11-DOCKER.md) | Docker kavramları, offline kurulum, compose yapısı, komutlar |
@@ -149,6 +150,7 @@ sudo elk project create order-service --user order_viewer
 | Docker (statik binary) | 29.10.0 |
 | Docker Compose plugin | v5.7.1 |
 | Java (kütüphane) | 11+ (bağımlılık yok) |
+| Gradle (örnek C) | 8.14.3 |
 | SLF4J (opsiyonel) | 2.0.x |
 
 ## Lisans

@@ -119,7 +119,15 @@ else
   "$REPO_DIR/libs/build-without-maven.sh" "$WORK/libs"
   cp -r "$REPO_DIR/examples/order-service-sample" "$WORK/examples/"
 fi
-cp "$REPO_DIR/examples/run-sample.sh" "$WORK/examples/"
+# Ornek C (Gradle) ve D (duz Java): kaynak + hazir jar (offline'da dogrudan calissin)
+for ex in gradle-sample plain-java-sample; do
+  mkdir -p "$WORK/examples/$ex"
+  (cd "$REPO_DIR/examples/$ex" && tar cf - --exclude=build --exclude=.gradle --exclude=bin \
+      --exclude='*.jar' . ) | (cd "$WORK/examples/$ex" && tar xf -)
+done
+cp "$WORK"/libs/elk-logger-[0-9]*.jar "$WORK/examples/gradle-sample/libs/"
+cp "$WORK"/libs/elk-logger-[0-9]*.jar "$WORK/examples/plain-java-sample/lib/"
+cp "$REPO_DIR/examples/run-sample.sh" "$REPO_DIR/examples/README.md" "$WORK/examples/"
 cp "$REPO_DIR/libs/install-to-local-maven-repo.sh" "$WORK/libs/"
 
 # ------------------------------------------------------------ 4) Stack, scriptler, dokumanlar
@@ -130,7 +138,7 @@ cp "$REPO_DIR/offline-bundle/install.sh" "$REPO_DIR/offline-bundle/uninstall.sh"
 cp -r "$REPO_DIR/docs" "$WORK/docs"
 cp "$REPO_DIR/README.md" "$REPO_DIR/LICENSE" "$WORK/"
 echo "$ELK_VERSION" > "$WORK/ELK_VERSION"
-chmod +x "$WORK"/*.sh "$WORK"/elk-stack/bin/*.sh "$WORK"/examples/*.sh
+chmod +x "$WORK"/*.sh "$WORK"/elk-stack/bin/*.sh "$WORK"/examples/*.sh "$WORK"/examples/plain-java-sample/*.sh
 
 (cd "$WORK" && find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS)
 

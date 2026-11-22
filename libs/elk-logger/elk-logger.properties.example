@@ -5,11 +5,12 @@
 #
 #  Yukleme onceligi (sonraki oncekini ezer):
 #    1. kutuphane varsayilanlari
-#    2. classpath: elk-logger.properties
-#    3. harici dosya: -Delk.config.file=/etc/app/elk-logger.properties  veya  ELK_CONFIG_FILE
-#    4. ortam degiskenleri:  ELK_LOGSTASH_HOST=10.0.0.5   (elk.logstash.host)
-#    5. system property:     -Delk.logstash.host=10.0.0.5
-#    6. kod: ElkLoggerFactory.configure(Properties)
+#    2. classpath: elk-logger.properties  (Maven/Gradle: src/main/resources; duz Java: -cp "...:config")
+#    3. calisma dizini: ./elk-logger.properties | ./config/elk-logger.properties | ./conf/elk-logger.properties
+#    4. harici dosya: -Delk.config.file=/etc/app/elk-logger.properties  veya  ELK_CONFIG_FILE  (classpath:x.properties de olur)
+#    5. ortam degiskenleri:  ELK_LOGSTASH_HOST=10.0.0.5   (elk.logstash.host)
+#    6. system property:     -Delk.logstash.host=10.0.0.5
+#    7. kod: ElkLoggerFactory.configure(Properties)
 #  Degerlerde ${DEGISKEN} veya ${DEGISKEN:varsayilan} kullanilabilir.
 #  Detayli aciklama: docs/07-KONFIGURASYON-REFERANSI.md
 # =====================================================================================

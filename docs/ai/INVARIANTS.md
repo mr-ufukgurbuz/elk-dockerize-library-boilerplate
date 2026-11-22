@@ -14,6 +14,9 @@
 9. **Snapshot at call time.** Message formatting, MDC copy and JSON serialization happen on the caller thread so later mutation of arguments does not change the log.
 10. `Level.value()` numbers are persisted in ES as `level_value` — never change them.
 11. `ElkConfig.sanitizeProject` and the Logstash `gsub` must implement the same rule.
+11b. The library must work for **Maven, Gradle and plain-classpath** consumers: never rely on build-tool features
+    (resource filtering, generated sources) at runtime. Config lookup must keep the working-directory candidates
+    (`ConfigLoader.WORKDIR_CANDIDATES`) for plain Java apps.
 
 ### ELK stack
 12. Setup scripts are **idempotent** (they run on every `elk up`). Use `PUT` (create-or-update), never "create-only" calls that fail on second run (Kibana import uses `overwrite=true`; space creation tolerates HTTP 409).

@@ -34,7 +34,7 @@ Logstash (applogs.conf) → ES index applogs-<project>-YYYY.MM.dd → Kibana dat
 | `Level` | Levels and numeric `value()` written as `level_value` | Never renumber (ES queries depend on it) |
 | `ElkStats` | Immutable stats snapshot | New counters |
 | `config/ElkConfig` | ALL configuration keys (`KEY_*` constants), parsing, defaults, clamping | New setting |
-| `config/ConfigLoader` | Layered loading: classpath → file → env `ELK_*` → sysprops `elk.*`; `${VAR:default}` | Loading rules |
+| `config/ConfigLoader` | Layered loading: classpath → working dir (`elk-logger.properties`, `config/…`, `conf/…`) → explicit file (`elk.config.file`, also `classpath:` prefix) → env `ELK_*` → sysprops `elk.*`; `${VAR:default}` | Loading rules |
 | `internal/LoggerContext` | Runtime of one config; `dispatch()` is the hot path; owns sinks and dispatcher | Pipeline changes |
 | `internal/DefaultElkLogger` | Level check with immutable `CachedLevel` (context + generation) | Level performance |
 | `internal/MessageFormatter` | SLF4J-compatible `{}` formatting | Formatting |
@@ -43,6 +43,11 @@ Logstash (applogs.conf) → ES index applogs-<project>-YYYY.MM.dd → Kibana dat
 | `internal/AsyncDispatcher` | Queue, batching, retry/backoff, overflow, fallback, flush/shutdown | Delivery semantics |
 | `internal/Transport` + `TcpTransport`, `HttpTransport`, `Tls`, `Transports` | Network | New transport / TLS |
 | `internal/ConsoleSink`, `FallbackFileSink`, `LevelResolver`, `InternalLog`, `Version` | Helpers | — |
+
+Consumer examples (all four are exercised by `tests/e2e.sh` and the CI `consumers` job):
+`examples/order-service-sample` (Maven, native), `examples/payment-service-slf4j-sample` (Maven, SLF4J),
+`examples/gradle-sample` (Gradle, file dependency, no network), `examples/plain-java-sample`
+(no build tool: `build.sh`/`run.sh` + `.bat`, six classpath modes, `application.classpath` argfile, Eclipse `.classpath`).
 
 SLF4J module (`libs/elk-logger-slf4j`): `ElkServiceProvider` (registered in `META-INF/services/org.slf4j.spi.SLF4JServiceProvider`),
 `ElkSlf4jLoggerFactory`, `ElkSlf4jLogger` (extends `AbstractLogger`, implements `LoggingEventAware` for fluent key/values),

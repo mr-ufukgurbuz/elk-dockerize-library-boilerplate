@@ -6,20 +6,32 @@ sadece `elk-logger.properties` dosyasında proje adı ve sunucu adresi verilir.
 
 ## 1. Projeye ekleme
 
-### 1.a Maven — kurumsal Nexus/Artifactory varsa
-Jar'ı bir kez depoya yükleyin:
+Kütüphane **tek jar**dır ve hiçbir bağımlılığı yoktur; projeniz Maven, Gradle veya hiçbir build aracı kullanmayan
+düz Java olabilir. Her durumda yapılacak iki şey aynıdır:
+
+1. `elk-logger-1.0.0.jar` uygulamanın **classpath**'inde olmalı.
+2. `elk-logger.properties` bulunabilir olmalı (classpath'te, çalışma dizininde veya `-Delk.config.file` ile).
+
+| Proje tipi | Jar nasıl eklenir | Konfigürasyon nereye | Örnek |
+|---|---|---|---|
+| **Maven** | `<dependency>` (Nexus veya `~/.m2`) | `src/main/resources/elk-logger.properties` | [Proje A](../examples/order-service-sample), [B](../examples/payment-service-slf4j-sample) |
+| **Gradle** | `implementation files('libs/elk-logger-1.0.0.jar')` veya koordinat | `src/main/resources/elk-logger.properties` | [Proje C](../examples/gradle-sample) |
+| **Düz Java** (build aracı yok) | `java -cp "...:lib/elk-logger-1.0.0.jar:config"`, `CLASSPATH`, MANIFEST `Class-Path`, `java @application.classpath`, IDE | `config/` (classpath'e eklenen dizin) veya çalışma dizini | [Proje D](../examples/plain-java-sample) |
+| **WAR** (Tomcat vb.) | `WEB-INF/lib/` | `WEB-INF/classes/` | — |
+
+### 1.a Maven
+
+Kurumsal Nexus/Artifactory varsa jar'ı bir kez depoya yükleyin:
 ```bash
 mvn deploy:deploy-file -Dfile=elk-logger-1.0.0.jar -DgroupId=io.github.elkboilerplate \
   -DartifactId=elk-logger -Dversion=1.0.0 -Dpackaging=jar \
   -Durl=http://nexus.local/repository/maven-releases -DrepositoryId=nexus
 ```
-
-### 1.b Maven — depo yok (offline makine)
+Depo yoksa (offline makine) yerel `~/.m2`'ye kurun:
 ```bash
-cd elk-offline-bundle-*/libs && ./install-to-local-maven-repo.sh     # ~/.m2'ye kurar
+cd elk-offline-bundle-*/libs && ./install-to-local-maven-repo.sh
 ```
-
-Ardından `pom.xml`:
+`pom.xml`:
 ```xml
 <dependency>
   <groupId>io.github.elkboilerplate</groupId>
@@ -28,26 +40,86 @@ Ardından `pom.xml`:
 </dependency>
 ```
 
-### 1.c Gradle
+### 1.b Gradle
+
+Offline'da en kolayı jar'ı projeye koyup dosya bağımlılığı olarak eklemektir (Groovy DSL):
 ```groovy
-dependencies { implementation files('libs/elk-logger-1.0.0.jar') }   // veya mavenLocal() + koordinat
+dependencies {
+    implementation files('libs/elk-logger-1.0.0.jar')
+    // veya: implementation fileTree(dir: 'libs', include: ['*.jar'])
+    // veya (mavenLocal()/Nexus ile): implementation 'io.github.elkboilerplate:elk-logger:1.0.0'
+}
+```
+Kotlin DSL: `implementation(files("libs/elk-logger-1.0.0.jar"))`.
+Gradle wrapper internetten Gradle indirdiği için offline makinede kurulu Gradle kullanın: `gradle --offline build`.
+Detay ve `installDist` ile dağıtım: [examples/gradle-sample/README.md](../examples/gradle-sample/README.md).
+
+### 1.c Düz Java — Maven/Gradle yok
+
+Jar'ı `lib/`, konfigürasyonu `config/` dizinine koyun ve uygulamanın classpath'ine ekleyin. Hepsi
+[Proje D](../examples/plain-java-sample)'de test edilmiş yöntemler (Windows'ta ayraç `;`):
+
+```bash
+# derleme
+javac --release 11 -cp "lib/*" -d build/classes $(find src -name '*.java')
+
+# 1) -cp ile (config/ dizini classpath'te -> elk-logger.properties bulunur)
+java -cp "build/classes:lib/*:config" com.acme.Main
+
+# 2) classpath bir dosyada (Java 9+ argüman dosyası) — application.classpath içeriği: -cp build/classes:lib/*:config
+java @application.classpath com.acme.Main
+
+# 3) CLASSPATH ortam değişkeni
+export CLASSPATH="build/classes:lib/*:config"; java com.acme.Main
+
+# 4) çalıştırılabilir jar: MANIFEST'te  Class-Path: lib/elk-logger-1.0.0.jar config/
+java -jar app.jar
+
+# 5) config classpath'te değil: kütüphane çalışma dizininde ./elk-logger.properties,
+#    ./config/elk-logger.properties, ./conf/elk-logger.properties dosyalarını kendisi arar
+java -cp "build/classes:lib/*" com.acme.Main
+
+# 6) konfigürasyon başka yerde
+java -Delk.config.file=/etc/app/elk-logger.properties -cp "build/classes:lib/*" com.acme.Main
 ```
 
-### 1.d Build aracı yok
-```bash
-javac -cp elk-logger-1.0.0.jar -d out $(find src -name '*.java')
-java  -cp out:elk-logger-1.0.0.jar com.acme.Main
-```
+> `java -jar` kullanıldığında `-cp` ve `CLASSPATH` yok sayılır; jar'lar MANIFEST `Class-Path` ile verilmelidir
+> (yollar jar'ın bulunduğu dizine göre, dizinler `/` ile biter).
+
+**IDE:** Eclipse → *Build Path → Add External Archives* (+ `config` için *Add Class Folder*); IntelliJ →
+*Project Structure → Modules → Dependencies → + JARs or Directories*; NetBeans → *Properties → Libraries → Add JAR/Folder*.
+Proje D'deki `.classpath`/`.project` Eclipse'te doğrudan açılır.
+
+### 1.d WAR / uygulama sunucusu
+
+`WEB-INF/lib/elk-logger-1.0.0.jar` ve `WEB-INF/classes/elk-logger.properties`. Aynı sunucudaki her uygulama
+kendi jar'ını ve kendi `elk.project.name`'ini taşımalıdır (jar'ı sunucunun ortak `lib/` dizinine koymayın).
+
+### 1.e SLF4J kullanan projeler (her proje tipi için)
+
+Kod `org.slf4j.Logger` kullanıyorsa classpath'e üç jar: `slf4j-api-2.0.13.jar`, `elk-logger-slf4j-1.0.0.jar`,
+`elk-logger-1.0.0.jar` (bkz. §5). Gradle: `implementation files('libs/slf4j-api-2.0.13.jar')`,
+`runtimeOnly files('libs/elk-logger-slf4j-1.0.0.jar', 'libs/elk-logger-1.0.0.jar')`.
+Düz Java: üçünü de `lib/`'e koyup `-cp "...:lib/*"`.
 
 ## 2. Konfigürasyon
 
-`src/main/resources/elk-logger.properties` (en az):
+En az şu iki satır:
 ```properties
 elk.project.name=order-service
 elk.logstash.host=10.0.0.5
 ```
-Tüm ayarlar: [07-KONFIGURASYON-REFERANSI](07-KONFIGURASYON-REFERANSI.md). Çalışma zamanında farklı dosya:
-`java -Delk.config.file=/etc/order-service/elk-logger.properties -jar app.jar`
+
+Dosyanın arandığı yerler (sonraki öncekini ezer):
+
+| # | Yer | Tipik kullanım |
+|---|---|---|
+| 1 | Classpath'te `elk-logger.properties` | Maven/Gradle `src/main/resources`; düz Java'da classpath'e eklenen `config/` dizini |
+| 2 | Çalışma dizininde `elk-logger.properties`, `config/elk-logger.properties`, `conf/elk-logger.properties` (ilk bulunan) | Düz Java, script ile başlatılan uygulamalar |
+| 3 | `-Delk.config.file=/yol/dosya.properties` veya `ELK_CONFIG_FILE` (`classpath:ozel.properties` biçimi de olur) | Prod'da uygulamadan ayrı konfig |
+| 4 | `ELK_*` ortam değişkenleri, `-Delk.*` system property'leri | Tek tek değer ezme |
+
+Tüm ayarlar: [07-KONFIGURASYON-REFERANSI](07-KONFIGURASYON-REFERANSI.md). Hangi dosyanın okunduğunu görmek için `-Delk.debug=true`.
 
 ## 3. API
 

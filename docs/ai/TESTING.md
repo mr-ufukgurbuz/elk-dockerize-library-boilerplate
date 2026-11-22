@@ -21,7 +21,8 @@ Also verify the no-Maven path still compiles: `./libs/build-without-maven.sh /tm
 sudo sysctl -w vm.max_map_count=262144
 tests/e2e.sh --down
 ```
-Starts the real stack from `elk-stack/`, runs both sample apps with a unique `APP_ENV`, asserts:
+Starts the real stack from `elk-stack/`, runs the Maven samples A/B, the plain-Java sample D (`build.sh`, `run.sh cp`, `run.sh jar`)
+and, if `gradle` is installed, the Gradle sample C (`gradle --offline run`), each with a unique `APP_ENV`, asserts:
 documents exist in `applogs-order-service-*` and `applogs-payment-service-*`, no cross-project leakage,
 ERROR events carry `exception.stacktrace`, the Kibana dashboard object exists.
 
@@ -49,6 +50,7 @@ The Docker-install part of `install.sh` can only be fully tested on a real RHEL 
 ## 5. Final checklist before you finish
 
 - [ ] `mvn -B verify` green
+- [ ] Consumers still work: `cd examples/gradle-sample && gradle --offline build`, `cd examples/plain-java-sample && ./build.sh && for m in cp argfile env jar workdir file; do ELK_TRANSPORT=none ./run.sh $m 2 0; done`
 - [ ] `bash -n` on every changed `.sh`
 - [ ] `cd elk-stack && cp -n .env.example .env && docker compose config -q`
 - [ ] ndjson regenerated if generator changed (CI diff check)

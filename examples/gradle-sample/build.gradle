@@ -1,0 +1,64 @@
+// =====================================================================
+//  ORNEK PROJE C: inventory-service (Gradle)
+//  Calistirma:  gradle run            (offline:  gradle --offline run)
+//  Paketleme :  gradle installDist    -> build/install/inventory-service/bin/inventory-service
+//
+//  Bu proje internetten HICBIR bagimlilik indirmez; elk-logger jar'i dosyadan eklenir.
+//  Gradle wrapper (gradlew) kullanilmaz cunku wrapper Gradle'i internetten indirir;
+//  offline makinede kurulu bir Gradle (8.x) kullanin.
+// =====================================================================
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.example'
+version = '1.0.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 11
+}
+
+// elk-logger jar'inin yeri: once -PelkLoggerJar=..., sonra libs/, sonra repo icindeki dist/
+def elkLoggerJar = [findProperty('elkLoggerJar'), 'libs/elk-logger-1.0.0.jar', '../../dist/elk-logger-1.0.0.jar']
+        .findAll { it }
+        .collect { file(it) }
+        .find { it.exists() }
+
+dependencies {
+    // ---- SECENEK 1 (varsayilan, offline): jar dosyasini dogrudan ekle --------------------
+    implementation files(elkLoggerJar ?: 'libs/elk-logger-1.0.0.jar')
+
+    // ---- SECENEK 2: libs/ dizinindeki tum jar'lar ------------------------------------------
+    // implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // ---- SECENEK 3: yerel Maven deposu (~/.m2) - libs/install-to-local-maven-repo.sh ile kurulduysa
+    // repositories { mavenLocal() }  ve:
+    // implementation 'io.github.elkboilerplate:elk-logger:1.0.0'
+
+    // ---- SECENEK 4: kurumsal Nexus/Artifactory ---------------------------------------------
+    // repositories { maven { url 'http://nexus.local/repository/maven-releases'; allowInsecureProtocol = true } }
+    // implementation 'io.github.elkboilerplate:elk-logger:1.0.0'
+
+    // ---- SLF4J ile kullanmak isterseniz (mevcut kod org.slf4j.Logger kullaniyorsa) ---------
+    // implementation files('libs/slf4j-api-2.0.13.jar')
+    // runtimeOnly    files('libs/elk-logger-slf4j-1.0.0.jar')
+}
+
+application {
+    mainClass = 'com.example.inventory.InventoryServiceApp'
+    applicationName = 'inventory-service'
+    // Calisma aninda farkli konfig vermek icin:
+    // applicationDefaultJvmArgs = ['-Delk.config.file=/etc/inventory/elk-logger.properties']
+}
+
+// 'gradle run --args="100 50"' ile arguman verilebilir
+tasks.named('run') {
+    standardInput = System.in
+}

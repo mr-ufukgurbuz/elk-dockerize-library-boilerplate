@@ -1,6 +1,16 @@
 # 08 — Örnek Projeler
 
-İki bağımsız örnek, iki ayrı loglama alanına yazar ve kütüphanenin iki kullanım biçimini gösterir.
+Dört bağımsız örnek, dört ayrı loglama alanına yazar; kütüphanenin farklı **API** ve farklı **build aracı**
+senaryolarındaki kullanımını gösterir:
+
+| | Proje | Build | API | Transport | Index |
+|---|---|---|---|---|---|
+| A | [`order-service-sample`](../examples/order-service-sample) | Maven | native `ElkLogger` | TCP | `applogs-order-service-*` |
+| B | [`payment-service-slf4j-sample`](../examples/payment-service-slf4j-sample) | Maven | SLF4J | HTTP | `applogs-payment-service-*` |
+| C | [`gradle-sample`](../examples/gradle-sample) | **Gradle** | native | TCP | `applogs-inventory-service-*` |
+| D | [`plain-java-sample`](../examples/plain-java-sample) | **Yok** (javac/java, classpath) | native | TCP | `applogs-billing-batch-*` |
+
+A ve B'nin ayrıntıları:
 
 | | Proje A — `order-service-sample` | Proje B — `payment-service-slf4j-sample` |
 |---|---|---|
@@ -31,6 +41,28 @@ mvn -B -pl examples/order-service-sample,examples/payment-service-slf4j-sample d
 cd examples/order-service-sample
 java -cp "target/order-service-sample-1.0.0.jar:target/lib/*" com.example.orders.OrderServiceApp 100 50
 ```
+
+### Proje C — Gradle
+```bash
+cd examples/gradle-sample
+gradle --offline run --args="100 50"
+gradle --offline installDist && build/install/inventory-service/bin/inventory-service 100 50
+```
+Jar `build.gradle`'da `implementation files('libs/elk-logger-1.0.0.jar')` ile eklenir; internetten hiçbir şey indirilmez.
+Detay: [examples/gradle-sample/README.md](../examples/gradle-sample/README.md).
+
+### Proje D — Maven/Gradle yok (düz Java, classpath)
+```bash
+cd examples/plain-java-sample
+./build.sh                    # javac + billing-batch.jar   (Windows: build.bat)
+./run.sh cp 100 50            # java -cp "build/classes:lib/*:config"   (Windows: run.bat)
+./run.sh argfile              # java @application.classpath
+./run.sh env                  # CLASSPATH ortam değişkeni
+./run.sh jar                  # java -jar (MANIFEST Class-Path)
+./run.sh workdir              # config classpath'te değil, ./config/elk-logger.properties otomatik bulunur
+./run.sh file                 # -Delk.config.file=...
+```
+Eclipse'te doğrudan açılabilir (`.classpath`/`.project`). Detay: [examples/plain-java-sample/README.md](../examples/plain-java-sample/README.md).
 
 ## 2. Sonuçları görme
 
