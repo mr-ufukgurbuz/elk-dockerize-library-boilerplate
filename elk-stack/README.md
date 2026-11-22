@@ -1,5 +1,7 @@
 # elk-stack — Docker ile ELK Ortamı
 
+[🇬🇧 English](README.en.md) | 🇹🇷 Türkçe
+
 Offline sunucuya kopyalanan ortam (`install.sh` bunu `/opt/elk-stack` altına kurar).
 Elasticsearch + Logstash + Kibana'yı Docker Compose ile, tüm kurulum adımları otomatik olacak şekilde çalıştırır.
 

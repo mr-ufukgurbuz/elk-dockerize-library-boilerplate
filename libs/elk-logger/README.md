@@ -1,5 +1,7 @@
 # elk-logger — Java 11 Loglama Kütüphanesi
 
+[🇬🇧 English](README.en.md) | 🇹🇷 Türkçe
+
 SLF4J'ye benzer API ile loglayın; loglar arka planda ELK ortamına gider. **Hiçbir bağımlılığı yoktur**
 (tek jar, Java 11+). Ortam bilgisi (adres, port, seviye...) sadece `elk-logger.properties` dosyasından okunur.
 

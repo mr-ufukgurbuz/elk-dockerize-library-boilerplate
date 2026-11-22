@@ -127,7 +127,7 @@ for ex in gradle-sample plain-java-sample; do
 done
 cp "$WORK"/libs/elk-logger-[0-9]*.jar "$WORK/examples/gradle-sample/libs/"
 cp "$WORK"/libs/elk-logger-[0-9]*.jar "$WORK/examples/plain-java-sample/lib/"
-cp "$REPO_DIR/examples/run-sample.sh" "$REPO_DIR/examples/README.md" "$WORK/examples/"
+cp "$REPO_DIR/examples/run-sample.sh" "$REPO_DIR/examples/README.md" "$REPO_DIR/examples/README.en.md" "$WORK/examples/"
 cp "$REPO_DIR/libs/install-to-local-maven-repo.sh" "$WORK/libs/"
 
 # ------------------------------------------------------------ 4) Stack, scriptler, dokumanlar
@@ -136,7 +136,7 @@ mkdir -p "$WORK/elk-stack"
 (cd "$REPO_DIR/elk-stack" && tar cf - --exclude=.env . ) | (cd "$WORK/elk-stack" && tar xf -)
 cp "$REPO_DIR/offline-bundle/install.sh" "$REPO_DIR/offline-bundle/uninstall.sh" "$WORK/"
 cp -r "$REPO_DIR/docs" "$WORK/docs"
-cp "$REPO_DIR/README.md" "$REPO_DIR/LICENSE" "$WORK/"
+cp "$REPO_DIR/README.md" "$REPO_DIR/README.en.md" "$REPO_DIR/LICENSE" "$WORK/"
 echo "$ELK_VERSION" > "$WORK/ELK_VERSION"
 chmod +x "$WORK"/*.sh "$WORK"/elk-stack/bin/*.sh "$WORK"/examples/*.sh "$WORK"/examples/plain-java-sample/*.sh
 

@@ -1,5 +1,7 @@
 # ELK Dockerize + Java Logger Boilerplate (Offline / RHEL 8-9)
 
+[🇬🇧 English](README.en.md) | 🇹🇷 Türkçe
+
 İnternet erişimi **olmayan** bir RHEL 8/9 sunucusunda, üzerinde Docker bile kurulu değilken,
 **tek bir paketle** Elasticsearch + Logstash + Kibana ortamını ayağa kaldırmak; ardından Java 11
 projelerinden **SLF4J kullanır gibi** bu ortama log göndermek için hazır boilerplate.
@@ -66,7 +68,7 @@ Tek dosyalık kurulum paketi (Docker + ELK imajları + kütüphane + dokümanlar
 ```
 
 → `dist/elk-offline-bundle-8.19.25-x86_64.tar.gz` (~1.6 GB). Bu dosyayı USB/scp ile offline sunucuya taşıyın.
-(GitHub Actions'taki **"Offline Bundle"** workflow'u da aynı paketi artifact olarak üretir.)
+(GitHub Actions'taki **"Offline Bundle"** workflow'u aynı paketi üretip Releases sayfasına yükler.)
 
 **2) Offline RHEL sunucusunda kur ve başlat** (Docker yoksa kendisi kurar):
 

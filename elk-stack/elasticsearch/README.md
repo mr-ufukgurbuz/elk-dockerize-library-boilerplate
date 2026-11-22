@@ -1,5 +1,7 @@
 # Elasticsearch
 
+[🇬🇧 English](README.en.md) | 🇹🇷 Türkçe
+
 ## Nedir?
 
 **Elasticsearch (ES)**, JSON dokümanları saklayan, her alanı otomatik indeksleyen ve milyonlarca kayıt üzerinde

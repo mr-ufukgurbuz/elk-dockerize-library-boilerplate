@@ -1,5 +1,7 @@
 # Örnek Projeler
 
+[🇬🇧 English](README.en.md) | 🇹🇷 Türkçe
+
 | Proje | API | Transport | Loglama alanı |
 |---|---|---|---|
 | [`order-service-sample`](order-service-sample) (Proje A) | elk-logger native | TCP 5000 | `applogs-order-service-*` |

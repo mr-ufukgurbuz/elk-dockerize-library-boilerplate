@@ -1,5 +1,7 @@
 # Logstash
 
+[🇬🇧 English](README.en.md) | 🇹🇷 Türkçe
+
 ## Nedir?
 
 **Logstash**, farklı kaynaklardan veri alan (**input**), bu veriyi dönüştüren/zenginleştiren (**filter**) ve

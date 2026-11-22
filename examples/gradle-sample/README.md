@@ -1,5 +1,7 @@
 # Örnek Proje C — inventory-service (Gradle)
 
+[🇬🇧 English](README.en.md) | 🇹🇷 Türkçe
+
 Gradle ile derlenen bir projede elk-logger kullanımı. **İnternetten hiçbir şey indirmez**: jar dosyadan eklenir,
 yalnızca Gradle'ın çekirdek eklentileri (`java`, `application`) kullanılır.
 
