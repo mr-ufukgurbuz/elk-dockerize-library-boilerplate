@@ -1,5 +1,7 @@
 # offline-bundle — İnternetsiz Kurulum Paketi
 
+[🇬🇧 English](README.en.md) | 🇹🇷 Türkçe
+
 İnternete erişimi olmayan RHEL 8/9 sunucusuna, Docker dahil hiçbir şey kurulu değilken ELK ortamını
 kurmak için **tek dosyalık paket**.
 

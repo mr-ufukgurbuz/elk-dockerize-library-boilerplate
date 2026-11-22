@@ -1,5 +1,7 @@
 # Örnek Proje D — billing-batch (Maven/Gradle YOK, düz Java)
 
+[🇬🇧 English](README.en.md) | 🇹🇷 Türkçe
+
 Build aracı kullanmayan, `javac`/`java` ile derlenip çalıştırılan klasik bir Java 11 projesinde
 elk-logger kullanımı. Kütüphane **tek jar**dır ve hiçbir bağımlılığı yoktur; yapmanız gereken tek şey
 jar'ı uygulamanın **classpath**'ine eklemek ve `elk-logger.properties` dosyasını bulunabilir bir yere koymaktır.

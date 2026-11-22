@@ -1,5 +1,7 @@
 # Kibana
 
+[🇬🇧 English](README.en.md) | 🇹🇷 Türkçe
+
 ## Nedir?
 
 **Kibana**, Elasticsearch'teki veriyi tarayıcıdan **aramak, görselleştirmek ve izlemek** için kullanılan web arayüzüdür.
