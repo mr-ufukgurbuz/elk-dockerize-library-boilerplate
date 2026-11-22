@@ -1,0 +1,49 @@
+name: Offline Bundle
+
+# Elle tetiklenir: Actions -> Offline Bundle -> Run workflow
+# Cikti: elk-offline-bundle-<surum>-<arch>.tar.gz (artifact, ~1.6 GB)
+on:
+  workflow_dispatch:
+    inputs:
+      elk_version:
+        description: Elastic Stack surumu
+        default: '8.19.25'
+      docker_version:
+        description: Statik Docker surumu
+        default: '29.10.0'
+      compose_version:
+        description: Docker Compose surumu
+        default: 'v5.7.1'
+      arch:
+        description: Hedef mimari
+        type: choice
+        options: [x86_64, aarch64]
+        default: x86_64
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+          cache: maven
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc || true
+      - name: Build bundle
+        run: |
+          ./offline-bundle/build-bundle.sh \
+            --elk-version "${{ inputs.elk_version }}" \
+            --docker-version "${{ inputs.docker_version }}" \
+            --compose-version "${{ inputs.compose_version }}" \
+            --arch "${{ inputs.arch }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: elk-offline-bundle-${{ inputs.elk_version }}-${{ inputs.arch }}
+          path: |
+            dist/*.tar.gz
+            dist/*.sha256
+          compression-level: 0
+          retention-days: 7

@@ -1,0 +1,29 @@
+# Offline (statik binary) Docker kurulumu icin systemd unit.
+# install.sh tarafindan /etc/systemd/system/docker.service olarak kopyalanir.
+[Unit]
+Description=Docker Application Container Engine (offline static install)
+Documentation=https://docs.docker.com
+After=network-online.target firewalld.service time-set.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+# Statik binary'ler /usr/local/bin altinda: dockerd'nin kendi containerd/runc'unu bulmasi icin PATH'te once gelmeli
+Environment=PATH=/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart=/usr/local/bin/dockerd --config-file /etc/docker/daemon.json
+ExecReload=/bin/kill -s HUP $MAINPID
+TimeoutStartSec=0
+RestartSec=2
+Restart=always
+StartLimitBurst=3
+StartLimitIntervalSec=60
+LimitNOFILE=1048576
+LimitNPROC=infinity
+LimitCORE=infinity
+TasksMax=infinity
+Delegate=yes
+KillMode=process
+OOMScoreAdjust=-500
+
+[Install]
+WantedBy=multi-user.target

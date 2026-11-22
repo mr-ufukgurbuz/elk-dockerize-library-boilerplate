@@ -1,0 +1,5 @@
+# Tek pipeline: uygulama loglari. Yeni pipeline eklemek icin docs/04-LOGSTASH.md
+- pipeline.id: applogs
+  path.config: "/usr/share/logstash/pipeline/applogs.conf"
+  pipeline.workers: 2
+  pipeline.batch.size: 250

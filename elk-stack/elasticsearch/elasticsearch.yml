@@ -1,0 +1,29 @@
+# Tek node Elasticsearch ayarlari. Ortam degiskenleri docker-compose.yml'den gelir.
+cluster.name: elk-offline
+node.name: elk-es01
+network.host: 0.0.0.0
+discovery.type: single-node
+
+# Snapshot (yedek) dizini. Bkz. docs/09-OPERASYON-VE-SORUN-GIDERME.md
+path.repo: ["/usr/share/elasticsearch/snapshots"]
+
+# Guvenlik: kullanici adi/sifre zorunlu. HTTP katmaninda TLS kapali
+# (kapali ag varsayimi). TLS acmak icin docs/10-GUVENLIK.md.
+xpack.security.enabled: true
+xpack.security.http.ssl.enabled: false
+xpack.security.transport.ssl.enabled: false
+xpack.license.self_generated.type: basic
+
+# Kibana > Stack Monitoring ekrani icin kendi metriklerini toplar
+xpack.monitoring.collection.enabled: true
+
+# Offline ortam: GeoIP veritabani indirmeye calismasin
+ingest.geoip.downloader.enabled: false
+
+# Disk dolulugu esikleri (tek node'da replika olmadigi icin onemli)
+cluster.routing.allocation.disk.watermark.low: 85%
+cluster.routing.allocation.disk.watermark.high: 90%
+cluster.routing.allocation.disk.watermark.flood_stage: 95%
+
+# Yanlislikla tum index'lerin silinmesini engelle (DELETE /*)
+action.destructive_requires_name: true

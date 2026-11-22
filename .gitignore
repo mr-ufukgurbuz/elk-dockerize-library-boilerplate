@@ -1,0 +1,10 @@
+target/
+*.class
+.idea/
+*.iml
+.vscode/
+# Uretilen offline paketler (buyuk). dist/ altindaki jar'lar commit edilir.
+dist/elk-offline-bundle-*
+# Gercek sifreler
+elk-stack/.env
+logs/
