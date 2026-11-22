@@ -52,6 +52,7 @@ dependencies {
 ```
 Kotlin DSL: `implementation(files("libs/elk-logger-1.0.0.jar"))`.
 Gradle wrapper internetten Gradle indirdiği için offline makinede kurulu Gradle kullanın: `gradle --offline build`.
+Gradle 9.x kendisi JDK 17+ ister; yalnızca Java 11 olan ortamda **Gradle 8.x** (test edilen 8.14.3) kullanın.
 Detay ve `installDist` ile dağıtım: [examples/gradle-sample/README.md](../examples/gradle-sample/README.md).
 
 ### 1.c Düz Java — Maven/Gradle yok

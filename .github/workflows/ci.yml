@@ -69,6 +69,9 @@ jobs:
           distribution: temurin
           java-version: '11'
           cache: maven
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14.3'   # Gradle 9.x JDK 17+ ister; Java 11 ortami icin 8.x
       - run: sudo sysctl -w vm.max_map_count=262144
       - name: End-to-end (ELK + sample apps)
         run: tests/e2e.sh --down

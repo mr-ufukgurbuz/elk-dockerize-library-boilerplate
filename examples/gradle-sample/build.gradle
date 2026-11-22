@@ -5,7 +5,7 @@
 //
 //  Bu proje internetten HICBIR bagimlilik indirmez; elk-logger jar'i dosyadan eklenir.
 //  Gradle wrapper (gradlew) kullanilmaz cunku wrapper Gradle'i internetten indirir;
-//  offline makinede kurulu bir Gradle (8.x) kullanin.
+//  offline makinede kurulu bir Gradle kullanin. Gradle 9.x JDK 17+ ister; sadece Java 11 varsa Gradle 8.x.
 // =====================================================================
 plugins {
     id 'java'

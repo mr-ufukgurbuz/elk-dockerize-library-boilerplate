@@ -13,6 +13,10 @@ build/install/inventory-service/bin/inventory-service 100 50
 > **Gradle wrapper (`gradlew`) yok**: wrapper Gradle'ı internetten indirir. Offline makinede kurulu bir Gradle 8.x
 > kullanın (Gradle dağıtım zip'ini bir kez taşıyıp `unzip` + `PATH` yeterli). Test edilen sürüm: 8.14.3.
 
+> **Gradle sürümü:** Gradle **9.x kendisi JDK 17+ ile çalışır**. Sunucunuzda sadece Java 11 varsa **Gradle 8.x**
+> (test edilen: 8.14.3) kullanın. JDK 17+ varsa Gradle 9 de olur; `options.release = 11` sayesinde uygulama yine
+> Java 11 bytecode'u üretir ve Java 11'de çalışır.
+
 ## Bağımlılığı ekleme seçenekleri (`build.gradle`)
 
 **Groovy DSL (`build.gradle`):**
