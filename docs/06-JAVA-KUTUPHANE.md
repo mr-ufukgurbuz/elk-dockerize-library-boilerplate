@@ -135,6 +135,12 @@ ElkStats s = ElkLoggerFactory.getStats();
 boolean healthy = s.isConnected() && s.getQueueSize() < 0.8 * ElkLoggerFactory.getConfig().getQueueCapacity();
 ```
 
+Konsol çıktısı ve Kibana'daki karşılığı:
+
+![Konsol](images/terminal-sample-app.png)
+
+![Kibana doküman](images/kibana-discover-document.png)
+
 ## 4. Davranış garantileri
 
 | Garanti | Açıklama |

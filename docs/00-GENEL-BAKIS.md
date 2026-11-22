@@ -8,6 +8,10 @@
 - Her projenin **kendi loglama alanı** olması (A projesi → A alanı, B projesi → B alanı).
 - Loglar üzerinde seviye, metin, sınıf, exception, MDC ve yapısal alanlarla **filtreleme**; Kibana ile **izleme**.
 
+Sonuç (Kibana'da tüm projelerin logları):
+
+![Dashboard](images/kibana-dashboard-all-projects.png)
+
 ## 2. Bileşenler
 
 | Bileşen | Görev | Nerede |
@@ -20,6 +24,8 @@
 | **setup / kibana-setup** | Tek seferlik: kullanıcı/rol/ILM/template, data view/dashboard kurulumu | Docker container (işini yapıp çıkar) |
 | **bin/elk.sh** | Yönetim aracı: up/down/status/project/snapshot | Sunucu |
 | **install.sh** | Offline Docker + ELK kurulumu | Sunucu |
+
+Her bileşenin ne olduğu ve temel kullanımı: [Elasticsearch](../elk-stack/elasticsearch/README.md) · [Logstash](../elk-stack/logstash/README.md) · [Kibana](../elk-stack/kibana/README.md) · [Docker](11-DOCKER.md)
 
 ## 3. Veri akışı
 

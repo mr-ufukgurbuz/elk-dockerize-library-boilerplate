@@ -1,5 +1,8 @@
 # 05 — Kibana: Arama, Dashboard, Proje Alanları ve İzleme
 
+> **Kibana nedir?** Elasticsearch'teki veriyi tarayıcıdan aramak, görselleştirmek ve izlemek için web arayüzüdür.
+> Kavramlar (data view, KQL, Space, Lens): [elk-stack/kibana/README.md](../elk-stack/kibana/README.md).
+
 Adres: `http://<sunucu>:5601` — Kullanıcı `elastic`, şifre `/opt/elk-stack/.env` → `ELASTIC_PASSWORD`.
 Kibana offline çalışacak şekilde yapılandırılmıştır (telemetri, haber akışı, harita servisi kapalı).
 
@@ -17,9 +20,13 @@ Kibana offline çalışacak şekilde yapılandırılmıştır (telemetri, haber 
 Nesneler [`setup/kibana/generate-saved-objects.py`](../elk-stack/setup/kibana/generate-saved-objects.py)
 ile üretilir; değiştirip `python3 generate-saved-objects.py > applogs-saved-objects.ndjson` ve `sudo elk up`.
 
+![Dashboard](images/kibana-dashboard-all-projects.png)
+
 ## 2. Discover ile log arama ve filtreleme
 
 Menü → **Discover** → sol üstten data view seçin → sağ üstten zaman aralığı.
+
+![Discover KQL](images/kibana-discover-kql-filter.png)
 
 ### KQL örnekleri (arama çubuğu)
 
@@ -45,6 +52,10 @@ Menü → **Discover** → sol üstten data view seçin → sağ üstten zaman a
 - Aramayı **Save** ile kaydedip dashboard'a ekleyin.
 - **ES|QL** moduna geçip SQL benzeri sorgu yazabilirsiniz (örnekler: [03](03-ELASTICSEARCH.md#37-esql-kibana-discoverda-da-kullanılabilir)).
 
+Bir dokümanı açınca tüm alanlar (MDC, fields, exception, caller) görünür:
+
+![Doküman detayı](images/kibana-discover-document.png)
+
 ## 3. Proje bazlı alanlar (Spaces)
 
 ```bash
@@ -62,6 +73,12 @@ Sonuç:
 
 Var olan bir kullanıcıya proje yetkisi vermek: **Stack Management → Users →** kullanıcı → rol olarak
 `project_<proje>_reader` ekleyin. Tüm projeleri okuyabilen rol: `applogs_reader_all` (+ space yetkisi).
+
+![Spaces](images/kibana-spaces.png)
+
+`order_viewer` kullanıcısının gördüğü:
+
+![Proje dashboard](images/kibana-dashboard-project-space.png)
 
 ## 4. Kendi görselleştirmenizi yapmak
 
@@ -86,6 +103,10 @@ Menü → **Stack Monitoring** (ilk açılışta "Or, set up with self monitorin
 Veri `.monitoring-*` index'lerinde tutulur (internal collection; 8.x'te desteklenir, 9.x'te kaldırıldı).
 Ayrıca **Stack Management → Index Management** üzerinden `applogs-*` index'lerinin boyut ve doküman sayısı,
 **Index Lifecycle Policies → applogs-retention** üzerinden saklama politikası görülebilir.
+
+![Stack Monitoring](images/kibana-stack-monitoring.png)
+
+![Elasticsearch monitoring](images/kibana-monitoring-elasticsearch.png)
 
 ## 6. Alarmlar (Alerting)
 

@@ -3,6 +3,14 @@
 Offline sunucuya taşınacak **tek dosyalık** paket, internete erişimi olan herhangi bir Linux/macOS
 makinede (veya GitHub Actions'ta) üretilir.
 
+## 0. Hazır paket (en kolayı)
+
+Paket GitHub Actions tarafından üretilip **[GitHub Releases](https://github.com/mr-ufukgurbuz/elk-dockerize-library-boilerplate/releases)** sayfasına yüklenir
+(`elk-offline-bundle-<sürüm>-x86_64.tar.gz` / `-aarch64.tar.gz` + `.sha256`). İndirip §4'e geçin.
+
+> Paket ~1.6 GB'tır; GitHub git deposunda dosya başına 100 MB sınırı olduğundan repoya commit edilmez,
+> Release asset (dosya başına 2 GB sınırı) olarak yayınlanır.
+
 ## 1. Paketin içeriği
 
 ```
@@ -52,10 +60,16 @@ Seçenekler:
 > **Docker Hub rate-limit (HTTP 429)**: script 3 kez dener; yine olmazsa yereldeki imajı kullanır.
 > `docker login` yapmak limiti artırır.
 
-## 3. Yöntem B — GitHub Actions
+## 3. Yöntem B — GitHub Actions → Release
 
-Repo GitHub'daysa: **Actions → Offline Bundle → Run workflow**. Sürüm ve mimari seçilir; bittiğinde
-iş özetinden `elk-offline-bundle-*.tar.gz` artifact'ı indirilir (7 gün saklanır).
+[`.github/workflows/offline-bundle.yml`](../.github/workflows/offline-bundle.yml) paketi **x86_64 ve aarch64**
+için üretir ve GitHub Release'e yükler. İki tetikleme yolu:
+
+1. [`offline-bundle/RELEASE`](../offline-bundle/RELEASE) dosyasında `BUNDLE_TAG`'i artırıp (ör. `bundle-8.19.25-r2`),
+   gerekirse sürümleri değiştirip push'layın.
+2. **Actions → Offline Bundle → Run workflow** (etiket ve ELK sürümü girilebilir).
+
+İş ~15-25 dk sürer; bitince Releases sayfasında `BUNDLE_TAG` adlı yayın ve dosyalar görünür.
 
 ## 4. Paketi taşıma ve doğrulama
 

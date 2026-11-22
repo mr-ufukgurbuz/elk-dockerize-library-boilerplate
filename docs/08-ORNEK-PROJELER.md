@@ -22,6 +22,8 @@ cd elk-offline-bundle-*/
 ELK başka sunucudaysa: `ELK_HOST=10.0.0.5 ./examples/run-sample.sh order`
 (properties'te `elk.logstash.host=${ELK_HOST:localhost}` olduğu için).
 
+![Örnek uygulama](images/terminal-sample-app.png)
+
 ### Repo içinden (Maven ile)
 ```bash
 mvn -B install
@@ -39,6 +41,8 @@ java -cp "target/order-service-sample-1.0.0.jar:target/lib/*" com.example.orders
    sudo elk project create payment-service --user payment_viewer --password PayView123
    ```
    `order_viewer` ile giriş yapınca sadece order-service loglarını görürsünüz.
+
+   ![Proje dashboard](images/kibana-dashboard-project-space.png)
 3. Discover'da deneyin:
    - `project : order-service and level : ERROR`
    - `fields.stock < 10`

@@ -55,6 +55,8 @@ Sonuç ekranı:
 
 Şifre: `sudo grep ELASTIC_PASSWORD /opt/elk-stack/.env`
 
+![elk summary](images/terminal-elk-summary.png)
+
 ## 2. Kurulum sonrası doğrulama
 
 ```bash
@@ -63,6 +65,8 @@ sudo elk test-log demo          # Java'sız test olayı gönder
 # 10 sn sonra:
 sudo elk status | grep applogs-demo
 ```
+
+![elk status](images/terminal-elk-status.png)
 
 Tarayıcıdan `http://<sunucu>:5601` → `elastic` / şifre → **Dashboards → Uygulama Logları (Tüm Projeler)**.
 

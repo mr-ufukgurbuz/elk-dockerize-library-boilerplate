@@ -80,3 +80,15 @@ Use `load_env` to get `$ES`, `$KB`, `$AUTH`. Use `die` for errors. Keep it idemp
 1. Bump `<version>` in root `pom.xml` and every module `pom.xml` (parent reference too) and `internal/Version.VERSION`.
 2. Update version strings in: `examples/*/pom.xml` dependency, `examples/run-sample.sh`, `libs/install-to-local-maven-repo.sh` (`V=`), `tests/e2e.sh` jar names, docs (`grep -rn "1\.0\.0"`).
 3. `mvn -B verify`, copy jars to `dist/` (`cp libs/*/target/elk-logger*.jar dist/` and remove old ones).
+
+## R11. Publish a new offline bundle release
+
+1. Edit `offline-bundle/RELEASE`: bump `BUNDLE_TAG` (e.g. `bundle-8.19.25-r2`); change versions if needed.
+2. Commit + push. The `Offline Bundle` workflow builds both architectures and uploads them to that Release.
+3. Asset limit is 2 GB per file; the workflow fails early if exceeded. Never commit `*.tar.gz` bundles to git.
+
+## R12. Refresh documentation screenshots
+
+Follow `tools/screenshots/README.md` (needs a running stack with sample data). Keep file names stable;
+they are referenced from `README.md`, component READMEs and `docs/*.md`. Do not show host OS details
+that differ from the documented target (window titles use the neutral `elk-server`).

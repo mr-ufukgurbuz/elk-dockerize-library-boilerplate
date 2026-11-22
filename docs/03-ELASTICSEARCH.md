@@ -1,5 +1,9 @@
 # 03 — Elasticsearch
 
+> **Elasticsearch nedir?** JSON dokümanları saklayan, her alanı indeksleyen ve büyük veri üzerinde milisaniyeler içinde
+> arama/filtreleme/istatistik yapan bir arama motorudur. Bu projede logların saklandığı ve sorgulandığı yerdir.
+> Kavramlar (index, mapping, keyword/text, shard, ILM): [elk-stack/elasticsearch/README.md](../elk-stack/elasticsearch/README.md).
+
 ## 1. Rolü ve konfigürasyonu
 
 Tek node (`discovery.type: single-node`), güvenlik açık (kullanıcı/şifre), HTTP TLS kapalı.
@@ -63,6 +67,10 @@ Heap: `.env` → `ES_HEAP` (RAM'in en fazla yarısı, ≤31g).
 
 Aşağıdaki örnekler Kibana → **Dev Tools** konsoluna yapıştırılabilir. Komut satırından:
 `curl -u elastic:$ELASTIC_PASSWORD -H 'Content-Type: application/json' http://localhost:9200/...`
+
+![Dev Tools](images/kibana-devtools-query.png)
+
+![REST API](images/terminal-es-query.png)
 
 ### 3.1 Bir projenin son 15 dakikadaki ERROR logları
 ```json
@@ -164,6 +172,10 @@ Süreyi değiştirmek: `.env` → `LOG_RETENTION_DAYS=60` ve `sudo elk up` (setu
 mevcut index'lere de uygulanır). Proje bazlı farklı süre gerekiyorsa: yeni bir politika oluşturup
 `PUT applogs-<proje>-*/_settings {"index.lifecycle.name": "<politika>"}` ve kalıcılık için
 `applogs-<proje>-*` pattern'li, daha yüksek priority'li ek bir index template ekleyin.
+
+![ILM politikası](images/kibana-ilm-policy.png)
+
+![Index Management](images/kibana-index-management.png)
 
 ## 5. Faydalı yönetim komutları
 

@@ -74,5 +74,7 @@ Startup order: `elasticsearch (healthy)` → `setup (exit 0)` → `logstash`, `k
 | `offline-bundle/install.sh` | Offline RHEL. Verifies checksums, installs docker (static, `/usr/local/bin`, systemd unit, daemon.json, iptables fallback), sysctl, `docker load`, copies stack to `/opt/elk-stack` keeping existing `.env`, symlink `/usr/local/bin/elk`, firewall, `elk up` |
 | `offline-bundle/uninstall.sh` | Reverse |
 | `offline-bundle/docker-files/` | `docker.service`, `daemon.json` |
-| `.github/workflows/offline-bundle.yml` | Manual workflow producing the bundle as artifact |
+| `offline-bundle/RELEASE` | Release tag + versions; changing it on push triggers the bundle workflow |
+| `.github/workflows/offline-bundle.yml` | Builds bundles (x86_64 + aarch64) and uploads them to a GitHub Release (`BUNDLE_TAG`). Bundles are NEVER committed to git (100 MB file limit) |
+| `tools/screenshots/` | Dev-time Playwright scripts that regenerate `docs/images/*.png` |
 | `.github/workflows/ci.yml` | Java build/tests, shell syntax, compose validation, ndjson drift check, e2e |

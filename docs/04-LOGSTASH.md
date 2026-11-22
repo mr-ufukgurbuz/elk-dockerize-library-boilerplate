@@ -1,5 +1,8 @@
 # 04 — Logstash
 
+> **Logstash nedir?** Veriyi alan (input), dönüştüren (filter) ve hedefe yazan (output) bir veri boru hattıdır.
+> Kavramlar: [elk-stack/logstash/README.md](../elk-stack/logstash/README.md).
+
 ## 1. Rolü
 
 Uygulamalardan gelen olayları alır, normalize eder ve proje adına göre doğru Elasticsearch index'ine yazar.
@@ -65,6 +68,10 @@ curl -s localhost:9600/_node/stats/pipelines/applogs?pretty   # in/out/filtered 
 curl -s localhost:9600/_node/hot_threads?human=true
 sudo elk logs logstash
 ```
+
+![Logstash pipeline istatistikleri](images/terminal-logstash-stats.png)
+
+![Logstash monitoring](images/kibana-monitoring-logstash.png)
 Kibana → **Stack Monitoring → Logstash**: olay hızı, gecikme, JVM, kuyruk (internal collection; 8.x'te
 çalışır, "deprecated" uyarısı normaldir).
 
