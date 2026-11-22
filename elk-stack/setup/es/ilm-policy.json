@@ -1,0 +1,24 @@
+{
+  "policy": {
+    "_meta": {
+      "description": "applogs-* index'lerini __RETENTION_DAYS__ gun sonra siler",
+      "managed_by": "elk-stack/setup"
+    },
+    "phases": {
+      "hot": {
+        "min_age": "0ms",
+        "actions": {
+          "set_priority": {
+            "priority": 100
+          }
+        }
+      },
+      "delete": {
+        "min_age": "__RETENTION_DAYS__d",
+        "actions": {
+          "delete": {}
+        }
+      }
+    }
+  }
+}

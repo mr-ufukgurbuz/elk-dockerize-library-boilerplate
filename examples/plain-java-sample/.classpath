@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Eclipse: File > Import > Existing Projects into Workspace ile acilir.
+     elk-logger jar'i ve config/ dizini (elk-logger.properties) uygulama classpath'indedir. -->
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="config"/>
+	<classpathentry kind="lib" path="lib/elk-logger-1.0.0.jar" sourcepath="lib/elk-logger-1.0.0-sources.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -1,0 +1,9 @@
+{
+  "indices": [
+    {
+      "names": ["applogs-*"],
+      "privileges": ["read", "view_index_metadata"]
+    }
+  ],
+  "metadata": { "managed_by": "elk-stack/setup", "description": "Tum projelerin loglarini okuma yetkisi" }
+}

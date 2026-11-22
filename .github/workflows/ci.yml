@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  java:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+          cache: maven
+      - name: Build & unit tests (Java 11)
+        run: mvn -B verify
+      - name: Build without Maven (offline path)
+        run: ./libs/build-without-maven.sh /tmp/out && ls -l /tmp/out
+
+  consumers:
+    # Kutuphaneyi kullanan projeler: Gradle ve build araci olmayan duz Java
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+          cache: maven
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14.3'
+      - run: mvn -B -q install -DskipTests
+      - name: Gradle sample (offline, file dependency)
+        working-directory: examples/gradle-sample
+        run: |
+          gradle --offline build installDist -PelkLoggerJar=$GITHUB_WORKSPACE/libs/elk-logger/target/elk-logger-1.0.0.jar
+          ELK_TRANSPORT=none build/install/inventory-service/bin/inventory-service 3 0
+      - name: Plain Java sample (javac / java -cp / java -jar / argfile)
+        working-directory: examples/plain-java-sample
+        run: |
+          cp $GITHUB_WORKSPACE/libs/elk-logger/target/elk-logger-1.0.0.jar lib/
+          ./build.sh
+          for m in cp argfile env jar workdir file; do ELK_TRANSPORT=none ./run.sh $m 3 0 2>&1 | tee /tmp/$m.log; grep -q 'applogs-billing-batch-' /tmp/$m.log; done
+
+  scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Shell syntax
+        run: for f in $(git ls-files '*.sh'); do bash -n "$f"; done
+      - name: Compose file is valid
+        working-directory: elk-stack
+        run: cp .env.example .env && docker compose config -q
+      - name: Saved objects are up to date
+        run: |
+          python3 elk-stack/setup/kibana/generate-saved-objects.py > /tmp/so.ndjson
+          diff -u elk-stack/setup/kibana/applogs-saved-objects.ndjson /tmp/so.ndjson
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: [java, scripts, consumers]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+          cache: maven
+      - run: sudo sysctl -w vm.max_map_count=262144
+      - name: End-to-end (ELK + sample apps)
+        run: tests/e2e.sh --down

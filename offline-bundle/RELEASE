@@ -1,0 +1,7 @@
+# Bu dosya degistirilip push'lanınca ".github/workflows/offline-bundle.yml" calisir:
+# offline paketi (x86_64 + aarch64) uretir ve BUNDLE_TAG etiketli GitHub Release'e yukler.
+# Yeni paket yayinlamak icin BUNDLE_TAG'i artirin (or. -r2) ve gerekirse surumleri degistirin.
+BUNDLE_TAG=bundle-8.19.25-r1
+ELK_VERSION=8.19.25
+DOCKER_VERSION=29.10.0
+COMPOSE_VERSION=v5.7.1

@@ -1,0 +1,89 @@
+# =====================================================================================
+#  elk-logger.properties  —  TUM AYARLAR (varsayilan degerleriyle)
+#  Bu dosyayi projenizin src/main/resources/elk-logger.properties yoluna kopyalayin
+#  ve sadece degistirmek istediginiz satirlari birakin.
+#
+#  Yukleme onceligi (sonraki oncekini ezer):
+#    1. kutuphane varsayilanlari
+#    2. classpath: elk-logger.properties  (Maven/Gradle: src/main/resources; duz Java: -cp "...:config")
+#    3. calisma dizini: ./elk-logger.properties | ./config/elk-logger.properties | ./conf/elk-logger.properties
+#    4. harici dosya: -Delk.config.file=/etc/app/elk-logger.properties  veya  ELK_CONFIG_FILE  (classpath:x.properties de olur)
+#    5. ortam degiskenleri:  ELK_LOGSTASH_HOST=10.0.0.5   (elk.logstash.host)
+#    6. system property:     -Delk.logstash.host=10.0.0.5
+#    7. kod: ElkLoggerFactory.configure(Properties)
+#  Degerlerde ${DEGISKEN} veya ${DEGISKEN:varsayilan} kullanilabilir.
+#  Detayli aciklama: docs/07-KONFIGURASYON-REFERANSI.md
+# =====================================================================================
+
+# ---------------------------------------------------------------- Kimlik
+# ZORUNLU. Loglama alani: index = applogs-<proje>-YYYY.MM.dd  (kucuk harf, [a-z0-9_-])
+elk.project.name=my-project
+# Insan okunur uygulama adi (varsayilan: project.name'in ham hali)
+#elk.application.name=My Project
+elk.environment=${APP_ENV:default}
+# Bos birakilirsa otomatik bulunur (HOSTNAME env / InetAddress)
+#elk.hostname=
+
+# ---------------------------------------------------------------- Baglanti
+elk.enabled=true
+# tcp | http | none
+elk.transport=tcp
+elk.logstash.host=localhost
+elk.logstash.tcp.port=5000
+elk.logstash.http.port=8080
+elk.logstash.http.path=/
+#elk.logstash.http.username=
+#elk.logstash.http.password=
+elk.connect.timeout.ms=3000
+elk.request.timeout.ms=10000
+
+# ---------------------------------------------------------------- TLS (Logstash input'unda ssl aciksa)
+elk.tls.enabled=false
+#elk.tls.truststore.path=/etc/app/logstash-truststore.p12
+#elk.tls.truststore.password=changeit
+elk.tls.truststore.type=PKCS12
+elk.tls.verify.hostname=true
+
+# ---------------------------------------------------------------- Seviyeler
+# TRACE | DEBUG | INFO | WARN | ERROR | OFF
+elk.level=INFO
+# Paket/sinif bazli (en uzun onek kazanir)
+#elk.level.com.mycompany.dao=DEBUG
+#elk.level.org.noisy.library=WARN
+
+# ---------------------------------------------------------------- Asenkron gonderim
+elk.queue.capacity=10000
+elk.batch.size=200
+elk.flush.interval.ms=1000
+# DROP_NEWEST | DROP_OLDEST | BLOCK
+elk.overflow.policy=DROP_NEWEST
+elk.overflow.block.timeout.ms=1000
+elk.retry.initial.backoff.ms=500
+elk.retry.max.backoff.ms=30000
+# 0 = sinirsiz deneme. >0 ise bu kadar denemeden sonra batch fallback dosyasina yazilir / atilir
+elk.retry.max.attempts=0
+elk.shutdown.timeout.ms=5000
+
+# ---------------------------------------------------------------- Konsol
+elk.console.enabled=true
+elk.console.level=TRACE
+# stdout | stderr
+elk.console.stream=stdout
+
+# ---------------------------------------------------------------- Fallback dosyasi
+elk.fallback.file.enabled=false
+elk.fallback.file.path=logs/elk-fallback.log
+elk.fallback.file.max.size.mb=100
+
+# ---------------------------------------------------------------- Icerik
+elk.include.mdc=true
+elk.include.caller=false
+elk.message.max.length=32000
+elk.stacktrace.max.length=32000
+# Her loga eklenen sabit etiketler -> labels.<ad>
+#elk.labels.team=payments
+#elk.labels.datacenter=dc1
+
+# ---------------------------------------------------------------- Teshis
+# true: kutuphanenin kendi DEBUG mesajlari stderr'e yazilir
+elk.debug=false

@@ -1,0 +1,184 @@
+{
+  "index_patterns": [
+    "applogs-*"
+  ],
+  "priority": 500,
+  "_meta": {
+    "description": "elk-logger kutuphanesinin olay semasi. Sozlesme: docs/ai/EVENT-SCHEMA.md",
+    "managed_by": "elk-stack/setup"
+  },
+  "template": {
+    "settings": {
+      "index.number_of_shards": 1,
+      "index.number_of_replicas": 0,
+      "index.refresh_interval": "5s",
+      "index.lifecycle.name": "applogs-retention",
+      "index.mapping.total_fields.limit": 2000,
+      "index.mapping.ignore_malformed": true,
+      "index.codec": "best_compression",
+      "index.query.default_field": [
+        "message",
+        "exception.message",
+        "exception.stacktrace",
+        "logger",
+        "message_template"
+      ]
+    },
+    "mappings": {
+      "dynamic": true,
+      "dynamic_templates": [
+        {
+          "mdc_strings": {
+            "path_match": "mdc.*",
+            "match_mapping_type": "string",
+            "mapping": {
+              "type": "keyword",
+              "ignore_above": 1024
+            }
+          }
+        },
+        {
+          "labels_strings": {
+            "path_match": "labels.*",
+            "match_mapping_type": "string",
+            "mapping": {
+              "type": "keyword",
+              "ignore_above": 1024
+            }
+          }
+        },
+        {
+          "fields_strings": {
+            "path_match": "fields.*",
+            "match_mapping_type": "string",
+            "mapping": {
+              "type": "keyword",
+              "ignore_above": 1024,
+              "fields": {
+                "text": {
+                  "type": "match_only_text"
+                }
+              }
+            }
+          }
+        },
+        {
+          "other_strings": {
+            "match_mapping_type": "string",
+            "mapping": {
+              "type": "keyword",
+              "ignore_above": 1024
+            }
+          }
+        }
+      ],
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        },
+        "project": {
+          "type": "keyword"
+        },
+        "application": {
+          "type": "keyword"
+        },
+        "environment": {
+          "type": "keyword"
+        },
+        "hostname": {
+          "type": "keyword"
+        },
+        "client_ip": {
+          "type": "keyword"
+        },
+        "transport": {
+          "type": "keyword"
+        },
+        "pid": {
+          "type": "long"
+        },
+        "level": {
+          "type": "keyword"
+        },
+        "level_value": {
+          "type": "integer"
+        },
+        "logger": {
+          "type": "keyword"
+        },
+        "thread": {
+          "type": "keyword"
+        },
+        "message": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 512
+            }
+          }
+        },
+        "message_template": {
+          "type": "keyword",
+          "ignore_above": 1024
+        },
+        "tags": {
+          "type": "keyword"
+        },
+        "lib_version": {
+          "type": "keyword"
+        },
+        "labels": {
+          "type": "object"
+        },
+        "mdc": {
+          "type": "object"
+        },
+        "fields": {
+          "type": "object"
+        },
+        "exception": {
+          "properties": {
+            "class": {
+              "type": "keyword"
+            },
+            "message": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 512
+                }
+              }
+            },
+            "root_class": {
+              "type": "keyword"
+            },
+            "root_message": {
+              "type": "text"
+            },
+            "stacktrace": {
+              "type": "text"
+            }
+          }
+        },
+        "caller": {
+          "properties": {
+            "class": {
+              "type": "keyword"
+            },
+            "method": {
+              "type": "keyword"
+            },
+            "file": {
+              "type": "keyword"
+            },
+            "line": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,24 @@
+api.http.host: "0.0.0.0"
+api.http.port: 9600
+
+# Alan adlari ECS'e zorlanmasin; kutuphane kendi duz semasini gonderir
+pipeline.ecs_compatibility: disabled
+
+# Logstash 9 oncesi uyarisini gidermek icin mevcut davranisi sabitle
+pipeline.buffer.type: direct
+
+# Logstash yeniden baslasa da gelen olaylar kaybolmasin (diskte kuyruk)
+queue.type: persisted
+queue.max_bytes: 1gb
+
+# ES'nin reddettigi (mapping hatasi vb.) olaylar burada saklanir
+dead_letter_queue.enable: true
+dead_letter_queue.max_bytes: 512mb
+
+# Kibana > Stack Monitoring icin Logstash metrikleri
+xpack.monitoring.enabled: true
+xpack.monitoring.elasticsearch.hosts: ["http://elasticsearch:9200"]
+xpack.monitoring.elasticsearch.username: logstash_system
+xpack.monitoring.elasticsearch.password: "${LOGSTASH_SYSTEM_PASSWORD}"
+
+log.level: info

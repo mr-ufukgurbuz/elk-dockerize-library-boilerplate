@@ -1,0 +1,117 @@
+name: Offline Bundle
+
+# Offline kurulum paketini uretir ve GitHub Release'e yukler.
+# Tetikleme:
+#   1) offline-bundle/RELEASE, build-bundle.sh veya bu workflow degisip push'laninca
+#      (surumler RELEASE dosyasindan okunur; ayni etiketteki dosyalar guncellenir)
+#   2) Elle: Actions -> Offline Bundle -> Run workflow (girdiler RELEASE dosyasini ezer)
+# Cikti: Releases sayfasinda elk-offline-bundle-<surum>-<arch>.tar.gz (+ .sha256)
+#        (GitHub release asset siniri 2 GB; paket ~1.6 GB)
+on:
+  push:
+    paths:
+      - offline-bundle/RELEASE
+      - offline-bundle/build-bundle.sh
+      - .github/workflows/offline-bundle.yml
+  workflow_dispatch:
+    inputs:
+      bundle_tag:
+        description: Release etiketi (bos = RELEASE dosyasindaki)
+        default: ''
+      elk_version:
+        description: Elastic Stack surumu (bos = RELEASE dosyasindaki)
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: offline-bundle
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.cfg.outputs.tag }}
+      elk: ${{ steps.cfg.outputs.elk }}
+      docker: ${{ steps.cfg.outputs.docker }}
+      compose: ${{ steps.cfg.outputs.compose }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: cfg
+        run: |
+          . <(grep -E '^[A-Z_]+=' offline-bundle/RELEASE)
+          TAG="${{ inputs.bundle_tag }}"; TAG="${TAG:-$BUNDLE_TAG}"
+          ELK="${{ inputs.elk_version }}"; ELK="${ELK:-$ELK_VERSION}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "elk=$ELK" >> "$GITHUB_OUTPUT"
+          echo "docker=$DOCKER_VERSION" >> "$GITHUB_OUTPUT"
+          echo "compose=$COMPOSE_VERSION" >> "$GITHUB_OUTPUT"
+      - name: Create / update release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.cfg.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: Offline ELK Bundle ${{ steps.cfg.outputs.elk }} (${{ steps.cfg.outputs.tag }})
+          body: |
+            Internet erisimi olmayan RHEL 8/9 sunucular icin tek parca kurulum paketi.
+
+            | Icerik | Surum |
+            |---|---|
+            | Elasticsearch / Logstash / Kibana (docker imajlari) | ${{ steps.cfg.outputs.elk }} |
+            | Docker (statik binary) | ${{ steps.cfg.outputs.docker }} |
+            | Docker Compose plugin | ${{ steps.cfg.outputs.compose }} |
+            | elk-logger / elk-logger-slf4j jar'lari, ornekler, dokumanlar | 1.0.0 |
+
+            **Kurulum**
+            ```bash
+            sha256sum -c elk-offline-bundle-${{ steps.cfg.outputs.elk }}-x86_64.tar.gz.sha256
+            tar xzf elk-offline-bundle-${{ steps.cfg.outputs.elk }}-x86_64.tar.gz
+            cd elk-offline-bundle-${{ steps.cfg.outputs.elk }}-x86_64
+            sudo ./install.sh --open-firewall
+            ```
+            ARM sunucular icin `aarch64` paketini kullanin. Detay: docs/02-KURULUM-RHEL.md
+          make_latest: true
+
+  bundle:
+    needs: prepare
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86_64, aarch64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+          cache: maven
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL || true
+          df -h /
+      - name: Build bundle
+        run: |
+          ./offline-bundle/build-bundle.sh \
+            --elk-version "${{ needs.prepare.outputs.elk }}" \
+            --docker-version "${{ needs.prepare.outputs.docker }}" \
+            --compose-version "${{ needs.prepare.outputs.compose }}" \
+            --arch "${{ matrix.arch }}"
+          rm -rf dist/elk-offline-bundle-*/      # sadece tar.gz kalsin (disk)
+          ls -lh dist/
+      - name: Check release asset size limit (2 GB)
+        run: |
+          for f in dist/elk-offline-bundle-*.tar.gz; do
+            s=$(stat -c %s "$f"); echo "$f $s"
+            [ "$s" -lt 2147483648 ] || { echo "::error::$f 2 GB'dan buyuk"; exit 1; }
+          done
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.prepare.outputs.tag }}
+          overwrite_files: true
+          files: |
+            dist/elk-offline-bundle-*.tar.gz
+            dist/elk-offline-bundle-*.tar.gz.sha256

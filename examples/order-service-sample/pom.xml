@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Kendi projenizde parent'a ihtiyacınız YOK; sadece aşağıdaki <dependency> yeterlidir. -->
+    <parent>
+        <groupId>io.github.elkboilerplate</groupId>
+        <artifactId>elk-logger-parent</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <groupId>com.example</groupId>
+    <artifactId>order-service-sample</artifactId>
+    <name>Ornek Proje A: order-service (ElkLogger native API)</name>
+
+    <dependencies>
+        <!-- TEK BAGIMLILIK: elk-logger. Baska hicbir jar gerekmez. -->
+        <dependency>
+            <groupId>io.github.elkboilerplate</groupId>
+            <artifactId>elk-logger</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.example.orders.OrderServiceApp</mainClass>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

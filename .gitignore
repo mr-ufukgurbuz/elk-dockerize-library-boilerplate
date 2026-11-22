@@ -1,0 +1,18 @@
+target/
+*.class
+.idea/
+*.iml
+.vscode/
+# Uretilen offline paketler (buyuk). dist/ altindaki jar'lar commit edilir.
+dist/elk-offline-bundle-*
+# Gercek sifreler
+elk-stack/.env
+logs/
+# Ornek projelerin derleme ciktilari / kopyalanan jar'lar
+examples/gradle-sample/build/
+examples/gradle-sample/.gradle/
+examples/gradle-sample/libs/*.jar
+examples/plain-java-sample/build/
+examples/plain-java-sample/bin/
+examples/plain-java-sample/lib/*.jar
+examples/plain-java-sample/billing-batch.jar
